@@ -10,6 +10,9 @@ class AgentModel(Agent):
         self.unique_id = unique_id
         self.model = model
         self.pos = None
+        self.mount = None
+        self.weapon = None
+        self.armour = None
 
     def step(self):
         pass
