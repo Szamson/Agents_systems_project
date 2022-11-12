@@ -1,6 +1,7 @@
-from SourceCode.Visualization.BattlefieldVisualization import StartSimulation
+from SourceCode.Visualization.server import server
 
 if __name__ == '__main__':
-    StartSimulation(500)
+
+    server.launch()
 
 
