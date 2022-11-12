@@ -9,10 +9,15 @@ class AgentModel(Agent):
 
         self.unique_id = unique_id
         self.model = model
-        self.pos = None
-        self.mount = None
-        self.weapon = None
-        self.armour = None
+        self.pos = None  # Position of the agent
+        self.mount = None  # Type of mount the warrior is gonna ride
+        self.weapon = None  # Type of weapon
+        self.armor = None  # Type of armor
+        self.bleeding_level = None  # How fast the agent is losing blood
+        self.pain_level = None  # In how much pain the agent is
 
     def step(self):
         pass
+
+
+
