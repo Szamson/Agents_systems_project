@@ -1,4 +1,4 @@
-from SourceCode.Visualization.server import server
+from BattleModel.server import server
 
 if __name__ == '__main__':
 

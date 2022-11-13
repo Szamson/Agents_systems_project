@@ -1,10 +1,10 @@
 import mesa
 
-from SourceCode.Models.BattlefieldModel import BattlefieldModel
-from SourceCode.Visualization.SimpleCanvas import SimpleCanvas
+from BattleModel.BattlefieldModel import BattlefieldModel
+from BattleModel.SimpleCanvas import SimpleCanvas
 
 
-def draw():
+def draw(agent):
     return {"Shape": "circle", "r": 2, "Filled": "true", "Color": "Red"}
 
 
@@ -15,5 +15,5 @@ model_params = {
 }
 
 server = mesa.visualization.ModularServer(
-    BattlefieldModel, [canvas], "Boids", model_params
+    BattlefieldModel, [canvas], "Battle", model_params
 )

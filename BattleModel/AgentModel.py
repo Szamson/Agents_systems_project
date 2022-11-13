@@ -1,7 +1,7 @@
 from mesa import *
-from SourceCode.Models.Weapon import *
-from SourceCode.Models.Armor import *
-from SourceCode.Models.Mount import *
+from BattleModel.Weapon import *
+from BattleModel.Armor import *
+from BattleModel.Mount import *
 import random
 
 
@@ -23,12 +23,12 @@ def random_mount():
 
 class AgentModel(Agent):
 
-    def __init__(self, unique_id, model):
+    def __init__(self, unique_id, model, pos):
         super().__init__(unique_id=unique_id, model=model)
 
         self.unique_id = unique_id
         self.model = model
-        self.pos = None  # Position of the agent
+        self.pos = pos  # Position of the agent
         self.mount = None  # Type of mount the warrior is gonna ride
         self.weapon = None  # Type of weapon
         self.armor = None  # Type of armor
@@ -42,12 +42,12 @@ class AgentModel(Agent):
 
 class Infantry(AgentModel):
 
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id=unique_id, model=model)
+    def __init__(self, unique_id, model, pos):
+        super().__init__(unique_id=unique_id, model=model, pos=pos)
 
         self.unique_id = unique_id
         self.model = model
-        self.pos = None
+        self.pos = pos
         self.mount = None
         self.weapon = random_weapon_melee()
         self.armor = random_armor()
@@ -60,12 +60,12 @@ class Infantry(AgentModel):
 
 
 class Cavalry(AgentModel):
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id=unique_id, model=model)
+    def __init__(self, unique_id, model, pos):
+        super().__init__(unique_id=unique_id, model=model, pos=pos)
 
         self.unique_id = unique_id
         self.model = model
-        self.pos = None
+        self.pos = pos
         self.mount = random_mount()
         self.weapon = random_weapon_melee()
         self.armor = random_armor()
@@ -78,12 +78,12 @@ class Cavalry(AgentModel):
 
 
 class Ranger(AgentModel):
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id=unique_id, model=model)
+    def __init__(self, unique_id, model, pos):
+        super().__init__(unique_id=unique_id, model=model, pos=pos)
 
         self.unique_id = unique_id
         self.model = model
-        self.pos = None
+        self.pos = pos
         self.mount = None
         self.weapon = random_weapon_ranged()
         self.armor = random_armor()
