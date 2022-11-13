@@ -5,7 +5,7 @@ from BattleModel.SimpleCanvas import SimpleCanvas
 
 
 def draw(agent):
-    return {"Shape": "circle", "r": 2, "Filled": "true", "Color": "Red"}
+    return {"Shape": "circle", "r": 2, "Filled": "true", "Color": agent.army}
 
 
 canvas = SimpleCanvas(draw, 500, 500)
