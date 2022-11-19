@@ -15,7 +15,7 @@ class BattlefieldModel(Model):
         self.space = ContinuousSpace(
             x_max=self.width,
             y_max=self.height,
-            torus=False)
+            torus=True)
         self.schedule = RandomActivation(self)
         self.fill_battlefield_TEST()
         self.running = True
@@ -31,7 +31,6 @@ class BattlefieldModel(Model):
             x = self.random.random() * self.space.x_max
             y = self.random.random() * self.space.y_max
             pos = np.array((x, y))
-            velocity = np.random.random(2) * 2 - 1
             knight = Infantry(
                 i,
                 self,
