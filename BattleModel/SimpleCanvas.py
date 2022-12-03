@@ -33,4 +33,5 @@ class SimpleCanvas(mesa.visualization.VisualizationElement):
             portrayal["x"] = x
             portrayal["y"] = y
             space_state.append(portrayal)
+        print(space_state)
         return space_state

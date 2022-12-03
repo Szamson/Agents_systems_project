@@ -43,7 +43,7 @@ class AgentModel(Agent):
         self.blood_left = None  # l on 60% fatal, 0.03 per level of bleeding per step
         self.pain_level = None  # In how much pain the agent is 0-100
         self.army = None  # For who they are fighting
-        self.vision = 10  # What the agent see
+        self.vision = 40  # What the agent see
 
     def step(self):
 
@@ -167,6 +167,35 @@ class Cavalry(AgentModel):
         self.pain_level = 0
         self.army = random_army()
 
+    def move_to_closest_target(self):
+        blood_loss_slow = self.blood_left / self.original_blood_level
+        pain_slow = 1 - self.pain_level / 100
+        armor_slow = 1 - self.armor.weight / 100
+
+        speed = self.mount.max_speed * blood_loss_slow * pain_slow * armor_slow
+
+        nemesis = self.closest_enemy()
+        if nemesis is not None:
+            distance_to_nemesis = self.model.space.get_distance(self.pos, nemesis.pos)
+
+            distance_needed = distance_to_nemesis - self.weapon.range
+
+            my_x, my_y = self.pos
+            op_x, op_y = nemesis.pos
+
+            new_x = abs(my_x - op_x) - distance_needed + op_x
+            new_y = abs(my_y - op_y) - distance_needed + op_y
+
+            new_x_speed = abs(my_x - op_x) - speed + op_x
+            new_y_speed = abs(my_y - op_y) - speed + op_y
+
+
+            if speed > distance_needed:
+                new_pos = (new_x, new_y)
+            else:
+                new_pos = (new_x_speed, new_y_speed)
+
+            self.model.space.move_agent(self, new_pos)
 
 
 class Ranger(AgentModel):

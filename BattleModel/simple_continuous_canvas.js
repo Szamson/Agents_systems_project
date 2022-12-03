@@ -5,9 +5,17 @@ const ContinuousVisualization = function(width, height, context) {
 	this.draw = function(objects) {
 		for (const p of objects) {
 			if (p.Shape === "rect")
+			{
 				this.drawRectangle(p.x, p.y, p.w, p.h, p.Color, p.Filled);
+			}
 			if (p.Shape === "circle")
+			{
 				this.drawCircle(p.x, p.y, p.r, p.Color, p.Filled);
+			}
+			if (p.Shape === "triangle")
+			{
+				this.drawTriangle(p.x, p.y, p.a, p.Color, p.Filled);
+			}
 		}
 	};
 
@@ -45,6 +53,27 @@ const ContinuousVisualization = function(width, height, context) {
 			context.fillRect(x0, y0, dx, dy);
 		else
 			context.strokeRect(x0, y0, dx, dy);
+	};
+
+	this.drawTriangle = function (x, y, a, color, fill) {
+		const cx = x * width;
+		const cy = y * height;
+		const tri_height = a;
+
+		context.beginPath();
+		context.moveTo(cx, cy);
+        context.lineTo(cx + a, cy);
+        context.lineTo(cx + a/2, cy-tri_height);
+		context.closePath();
+
+		context.strokeStyle = color;
+		context.stroke();
+
+		if (fill) {
+			context.fillStyle = color;
+			context.fill();
+		}
+
 	};
 
 	this.resetCanvas = function() {

@@ -3,8 +3,6 @@ from mesa.space import ContinuousSpace
 from mesa.time import RandomActivation
 from BattleModel.AgentModel import *
 
-
-
 class BattlefieldModel(Model):
 
     def __init__(self, width, height):
@@ -31,10 +29,24 @@ class BattlefieldModel(Model):
             x = self.random.random() * self.space.x_max
             y = self.random.random() * self.space.y_max
             pos = np.array((x, y))
-            knight = Infantry(
-                i,
-                self,
-                pos
-            )
+            unit = np.random.choice([1, 2, 3])
+            if unit == 1:
+                knight = Infantry(
+                    i,
+                    self,
+                    pos
+                )
+            elif unit == 2:
+                knight = Cavalry(
+                    i,
+                    self,
+                    pos
+                )
+            elif unit == 3:
+                knight = Ranger(
+                    i,
+                    self,
+                    pos
+                )
             self.space.place_agent(knight, pos)
             self.schedule.add(knight)
