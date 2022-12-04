@@ -91,13 +91,13 @@ class AgentModel(Agent):
             new_x_speed = abs(my_x - op_x) - speed + op_x
             new_y_speed = abs(my_y - op_y) - speed + op_y
 
-
             if speed > distance_needed:
                 new_pos = (new_x, new_y)
             else:
                 new_pos = (new_x_speed, new_y_speed)
 
             self.model.space.move_agent(self, new_pos)
+
 
     def scout(self):
         neighbors = self.model.space.get_neighbors(self.pos, self.vision, False)
@@ -124,7 +124,7 @@ class AgentModel(Agent):
         return
 
     def bleed(self):
-        self.blood_left -= self.bleeding_level*0.03
+        self.blood_left -= self.bleeding_level * 0.03
         self.check_if_dead()
 
     def check_if_dead(self):
@@ -149,7 +149,6 @@ class Infantry(AgentModel):
         self.blood_left = 5.67
         self.pain_level = 0
         self.army = random_army()  # TODO change for smf that makes more sense
-
 
 
 class Cavalry(AgentModel):
@@ -189,7 +188,6 @@ class Cavalry(AgentModel):
             new_x_speed = abs(my_x - op_x) - speed + op_x
             new_y_speed = abs(my_y - op_y) - speed + op_y
 
-
             if speed > distance_needed:
                 new_pos = (new_x, new_y)
             else:
@@ -212,4 +210,3 @@ class Ranger(AgentModel):
         self.blood_left = 5.67
         self.pain_level = 0
         self.army = random_army()
-

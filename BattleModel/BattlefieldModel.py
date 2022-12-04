@@ -3,6 +3,15 @@ from mesa.space import ContinuousSpace
 from mesa.time import RandomActivation
 from BattleModel.AgentModel import *
 
+
+def calculate_red(model):
+    return len([x for x in model.schedule.agents if x.army == "Red"])
+
+
+def calculate_blue(model):
+    return len([x for x in model.schedule.agents if x.army == "Blue"])
+
+
 class BattlefieldModel(Model):
 
     def __init__(self, width, height):
@@ -13,16 +22,17 @@ class BattlefieldModel(Model):
         self.space = ContinuousSpace(
             x_max=self.width,
             y_max=self.height,
-            torus=True)
+            torus=False)
         self.schedule = RandomActivation(self)
         self.fill_battlefield_TEST()
         self.running = True
-
+        self.data_collector = DataCollector(
+            model_reporters={"Army count - Red": calculate_red,
+                             "Army count - Blue": calculate_blue})
 
     def step(self):
         self.schedule.step()
-
-
+        self.data_collector.collect(self)
 
     def fill_battlefield_TEST(self):
         for i in range(100):

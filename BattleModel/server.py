@@ -14,6 +14,11 @@ def draw(agent):
         return {"Shape": "rect", "w": 0.01, "h": 0.01, "Filled": "true", "Color": agent.army}
 
 
+chart = mesa.visualization.ChartModule([
+    {"Label": "Army count - Red", "Color": "Red"},
+    {"Label": "Army count - Blue", "Color": "Blue"}],
+    data_collector_name='data_collector')
+
 canvas = SimpleCanvas(draw, 500, 500)
 model_params = {
     "width": 100,
@@ -21,5 +26,5 @@ model_params = {
 }
 
 server = mesa.visualization.ModularServer(
-    BattlefieldModel, [canvas], "Battle", model_params
+    BattlefieldModel, [canvas,chart], "Battle", model_params
 )
