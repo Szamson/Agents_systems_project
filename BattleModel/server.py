@@ -12,6 +12,8 @@ def draw(agent):
         return {"Shape": "triangle", "a": 4, "Filled": "true", "Color": agent.army}
     if agent.__class__ == Ranger:
         return {"Shape": "rect", "w": 0.01, "h": 0.01, "Filled": "true", "Color": agent.army}
+    if agent.__class__ == Obstacle:
+        return {"Shape": "polygon", "list_of_points": agent.points, "Filled": "true", "Color": "Black"}
 
 
 chart = mesa.visualization.ChartModule([
@@ -26,5 +28,5 @@ model_params = {
 }
 
 server = mesa.visualization.ModularServer(
-    BattlefieldModel, [canvas,chart], "Battle", model_params
+    BattlefieldModel, [canvas, chart], "Battle", model_params
 )

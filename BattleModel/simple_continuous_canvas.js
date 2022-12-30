@@ -16,7 +16,33 @@ const ContinuousVisualization = function(width, height, context) {
 			{
 				this.drawTriangle(p.x, p.y, p.a, p.Color, p.Filled);
 			}
+			if (p.Shape === "polygon")
+			{
+				this.drawPolygon(p.list_of_points, p.Color, p.Filled);
+			}
 		}
+	};
+
+	this.drawPolygon = function (list_of_points, Color, Filled) {
+
+		context.beginPath();
+		context.moveTo(list_of_points[0][0], list_of_points[0][1]);
+
+		for (let i=1; i<list_of_points.length; i+=1)
+		{
+			context.lineTo(list_of_points[i][0], list_of_points[i][1]);
+		}
+
+		context.closePath();
+
+		context.strokeStyle = Color;
+		context.stroke();
+
+		if (Filled) {
+			context.fillStyle = Color;
+			context.fill();
+		}
+
 	};
 
 	this.drawCircle = function(x, y, radius, color, fill) {
@@ -61,6 +87,7 @@ const ContinuousVisualization = function(width, height, context) {
 		const tri_height = a;
 
 		context.beginPath();
+
 		context.moveTo(cx, cy);
         context.lineTo(cx + a, cy);
         context.lineTo(cx + a/2, cy-tri_height);

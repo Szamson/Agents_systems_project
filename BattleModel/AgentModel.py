@@ -2,8 +2,12 @@ from mesa import *
 from BattleModel.Weapon import *
 from BattleModel.Armor import *
 from BattleModel.Mount import *
+from pathfinding.core.diagonal_movement import DiagonalMovement
+from pathfinding.core.grid import Grid
+from pathfinding.finder.a_star import AStarFinder
 import random
 import numpy as np
+import math
 
 
 def random_weapon_melee():
@@ -26,6 +30,18 @@ def random_army():
     return random.choice(["Blue", "Red"])
 
 
+def intersect(p1, p2, p3, p4):
+    """Returns a boolean. Check if 2 lines are intersecting."""
+
+    uA = ((p4[0] - p3[0]) * (p1[1] - p3[1]) - (p4[1] - p3[1]) * (p1[0] - p3[0])) / (
+                (p4[1] - p3[1]) * (p2[0] - p1[0]) - (p4[0] - p3[0]) * (p2[1] - p1[1]))
+    uB = ((p2[0] - p1[0]) * (p1[1] - p3[1]) - (p2[1] - p1[1]) * (p1[0] - p3[0])) / (
+                (p4[1] - p3[1]) * (p2[0] - p1[0]) - (p4[0] - p3[0]) * (p2[1] - p1[1]))
+
+    if 0 <= uA <= 1 and 0 <= uB <= 1:
+        return 1
+
+
 class AgentModel(Agent):
 
     def __init__(self, unique_id, model, pos):
@@ -43,12 +59,12 @@ class AgentModel(Agent):
         self.blood_left = None  # l on 60% fatal, 0.03 per level of bleeding per step
         self.pain_level = None  # In how much pain the agent is 0-100
         self.army = None  # For who they are fighting
-        self.vision = 40  # What the agent see
+        self.vision = 80  # What the agent see
 
     def step(self):
 
-        self.move_to_closest_target()
-        self.attack()
+        if not self.attack():
+            self.move_to_closest_target()
         self.bleed()
 
     def calculate_hit(self, weapon):
@@ -70,6 +86,7 @@ class AgentModel(Agent):
         self.check_if_dead()
 
     def move_to_closest_target(self):
+
         blood_loss_slow = self.blood_left / self.original_blood_level
         pain_slow = 1 - self.pain_level / 100
         armor_slow = 1 - self.armor.weight / 100
@@ -77,7 +94,46 @@ class AgentModel(Agent):
         speed = 12 * blood_loss_slow * pain_slow * armor_slow
 
         nemesis = self.closest_enemy()
-        if nemesis is not None:
+
+        if nemesis is None:
+            return
+
+        for obs in self.model.obstacle_list:
+            for i in range(len(obs.points)):
+                if intersect(self.pos, nemesis.pos, obs.points[i-1], obs.points[i]):
+                    pathfinder = True
+                    break
+                else:
+                    pathfinder = False
+
+        if pathfinder:
+
+            grid = Grid(matrix=self.model.dummy_board)
+
+            start = grid.node(math.floor(self.pos[0]), math.floor(self.pos[1]))
+            end = grid.node(math.floor(nemesis.pos[0]), math.floor(nemesis.pos[1]))
+
+            finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
+            path, runs = finder.find_path(start, end, grid)
+
+            if len(path) - 1 > speed:
+
+                temp_new_pos = path[math.floor(speed)]
+                new_x = self.pos[0] - math.floor(self.pos[0]) + temp_new_pos[0]
+                new_y = self.pos[1] - math.floor(self.pos[1]) + temp_new_pos[1]
+                new_pos = (new_x, new_y)
+            else:
+                temp_new_pos = path[-1]
+                new_x = self.pos[0] - math.floor(self.pos[0]) + temp_new_pos[0]
+                new_y = self.pos[1] - math.floor(self.pos[1]) + temp_new_pos[1]
+                new_pos = (new_x, new_y)
+
+            if 0 < new_pos[0] < float(self.model.width) and 0 < new_pos[1] < float(self.model.height):
+                self.model.space.move_agent(self, new_pos)
+
+
+        else:
+
             distance_to_nemesis = self.model.space.get_distance(self.pos, nemesis.pos)
 
             distance_needed = distance_to_nemesis - self.weapon.range
@@ -95,13 +151,17 @@ class AgentModel(Agent):
                 new_pos = (new_x, new_y)
             else:
                 new_pos = (new_x_speed, new_y_speed)
-
-            self.model.space.move_agent(self, new_pos)
-
+            if 0 < new_pos[0] < float(self.model.width) and 0 < new_pos[1] < float(self.model.height):
+                self.model.space.move_agent(self, new_pos)
 
     def scout(self):
         neighbors = self.model.space.get_neighbors(self.pos, self.vision, False)
-        enemies = [x for x in neighbors if x.army != self.army]
+        enemies = []
+        for x in neighbors:
+            if x.army == self.army or x.army is None:
+                pass
+            else:
+                enemies.append(x)
         return enemies
 
     def closest_enemy(self):
@@ -115,13 +175,13 @@ class AgentModel(Agent):
         nemesis = self.closest_enemy()
 
         if nemesis is None:
-            return
+            return False
 
         if self.model.space.get_distance(self.pos, nemesis.pos) < self.weapon.range:
             nemesis.apply_wound(np.random.choice(self.weapon.type_of_injury_inflicted))
         else:
-            return
-        return
+            return False
+        return True
 
     def bleed(self):
         self.blood_left -= self.bleeding_level * 0.03
@@ -166,35 +226,6 @@ class Cavalry(AgentModel):
         self.pain_level = 0
         self.army = random_army()
 
-    def move_to_closest_target(self):
-        blood_loss_slow = self.blood_left / self.original_blood_level
-        pain_slow = 1 - self.pain_level / 100
-        armor_slow = 1 - self.armor.weight / 100
-
-        speed = self.mount.max_speed * blood_loss_slow * pain_slow * armor_slow
-
-        nemesis = self.closest_enemy()
-        if nemesis is not None:
-            distance_to_nemesis = self.model.space.get_distance(self.pos, nemesis.pos)
-
-            distance_needed = distance_to_nemesis - self.weapon.range
-
-            my_x, my_y = self.pos
-            op_x, op_y = nemesis.pos
-
-            new_x = abs(my_x - op_x) - distance_needed + op_x
-            new_y = abs(my_y - op_y) - distance_needed + op_y
-
-            new_x_speed = abs(my_x - op_x) - speed + op_x
-            new_y_speed = abs(my_y - op_y) - speed + op_y
-
-            if speed > distance_needed:
-                new_pos = (new_x, new_y)
-            else:
-                new_pos = (new_x_speed, new_y_speed)
-
-            self.model.space.move_agent(self, new_pos)
-
 
 class Ranger(AgentModel):
     def __init__(self, unique_id, model, pos):
@@ -210,3 +241,19 @@ class Ranger(AgentModel):
         self.blood_left = 5.67
         self.pain_level = 0
         self.army = random_army()
+
+
+class Obstacle(Agent):
+
+    def __init__(self, unique_id, model, points_position):
+        super().__init__(unique_id=unique_id, model=model)
+
+        self.original_blood_level = 5.67
+
+        self.unique_id = unique_id
+        self.model = model
+        self.points = points_position  # points of polygon as [(x, y),(x, y), (x, y)]
+        self.army = None
+
+    def step(self) -> None:
+        pass
