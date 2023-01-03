@@ -44,7 +44,7 @@ def intersect(p1, p2, p3, p4):
 
 class AgentModel(Agent):
 
-    def __init__(self, unique_id, model, pos):
+    def __init__(self, unique_id, model, pos, army):
         super().__init__(unique_id=unique_id, model=model)
 
         self.original_blood_level = 5.67
@@ -58,8 +58,8 @@ class AgentModel(Agent):
         self.bleeding_level = None  # How fast the agent is losing blood
         self.blood_left = None  # l on 60% fatal, 0.03 per level of bleeding per step
         self.pain_level = None  # In how much pain the agent is 0-100
-        self.army = None  # For who they are fighting
-        self.vision = 80  # What the agent see
+        self.army = army  # For who they are fighting
+        self.vision = 100  # What the agent see
 
     def step(self):
 
@@ -98,6 +98,8 @@ class AgentModel(Agent):
         if nemesis is None:
             return
 
+        pathfinder = False
+
         for obs in self.model.obstacle_list:
             for i in range(len(obs.points)):
                 if intersect(self.pos, nemesis.pos, obs.points[i-1], obs.points[i]):
@@ -116,6 +118,8 @@ class AgentModel(Agent):
             finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
             path, runs = finder.find_path(start, end, grid)
 
+            new_pos = ()
+
             if len(path) - 1 > speed:
 
                 temp_new_pos = path[math.floor(speed)]
@@ -123,12 +127,13 @@ class AgentModel(Agent):
                 new_y = self.pos[1] - math.floor(self.pos[1]) + temp_new_pos[1]
                 new_pos = (new_x, new_y)
             else:
-                temp_new_pos = path[-1]
-                new_x = self.pos[0] - math.floor(self.pos[0]) + temp_new_pos[0]
-                new_y = self.pos[1] - math.floor(self.pos[1]) + temp_new_pos[1]
-                new_pos = (new_x, new_y)
+                if len(path):
+                    temp_new_pos = path[-1]
+                    new_x = self.pos[0] - math.floor(self.pos[0]) + temp_new_pos[0]
+                    new_y = self.pos[1] - math.floor(self.pos[1]) + temp_new_pos[1]
+                    new_pos = (new_x, new_y)
 
-            if 0 < new_pos[0] < float(self.model.width) and 0 < new_pos[1] < float(self.model.height):
+            if new_pos and 0 < new_pos[0] < float(self.model.width) and 0 < new_pos[1] < float(self.model.height):
                 self.model.space.move_agent(self, new_pos)
 
 
@@ -196,8 +201,8 @@ class AgentModel(Agent):
 
 class Infantry(AgentModel):
 
-    def __init__(self, unique_id, model, pos):
-        super().__init__(unique_id=unique_id, model=model, pos=pos)
+    def __init__(self, unique_id, model, pos, army):
+        super().__init__(unique_id=unique_id, model=model, pos=pos, army=army)
 
         self.unique_id = unique_id
         self.model = model
@@ -208,12 +213,12 @@ class Infantry(AgentModel):
         self.bleeding_level = 0
         self.blood_left = 5.67
         self.pain_level = 0
-        self.army = random_army()  # TODO change for smf that makes more sense
+        self.army = army
 
 
 class Cavalry(AgentModel):
-    def __init__(self, unique_id, model, pos):
-        super().__init__(unique_id=unique_id, model=model, pos=pos)
+    def __init__(self, unique_id, model, pos, army):
+        super().__init__(unique_id=unique_id, model=model, pos=pos, army=army)
 
         self.unique_id = unique_id
         self.model = model
@@ -224,12 +229,12 @@ class Cavalry(AgentModel):
         self.bleeding_level = 0
         self.blood_left = 5.67
         self.pain_level = 0
-        self.army = random_army()
+        self.army = army
 
 
 class Ranger(AgentModel):
-    def __init__(self, unique_id, model, pos):
-        super().__init__(unique_id=unique_id, model=model, pos=pos)
+    def __init__(self, unique_id, model, pos, army):
+        super().__init__(unique_id=unique_id, model=model, pos=pos, army=army)
 
         self.unique_id = unique_id
         self.model = model
@@ -240,7 +245,7 @@ class Ranger(AgentModel):
         self.bleeding_level = 0
         self.blood_left = 5.67
         self.pain_level = 0
-        self.army = random_army()
+        self.army = army
 
 
 class Obstacle(Agent):

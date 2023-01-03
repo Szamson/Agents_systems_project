@@ -19,7 +19,7 @@ def draw(agent):
 chart = mesa.visualization.ChartModule([
     {"Label": "Army count - Red", "Color": "Red"},
     {"Label": "Army count - Blue", "Color": "Blue"}],
-    data_collector_name='data_collector')
+    data_collector_name='datacollector')
 
 canvas = SimpleCanvas(draw, 500, 500)
 model_params = {

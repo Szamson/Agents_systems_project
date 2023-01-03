@@ -11,7 +11,7 @@ def contains(poly, x, y):
     isInside = False
 
     for i in range(len(N)):
-        v1 = N[i-1]
+        v1 = N[i - 1]
         v2 = N[i]
 
         if (v2[1] > y) != (v1[1] > y):
@@ -27,6 +27,20 @@ def calculate_red(model):
 
 def calculate_blue(model):
     return len([x for x in model.schedule.agents if x.army == "Blue"])
+
+
+def battle_continious(model):
+    temp_set = set(model.schedule.agents)
+    if len(temp_set) == 1 or len(temp_set) == 0:
+        return False
+    return True
+
+
+def reporter(model):
+    if len(model.schedule.agents):
+        return f"{model.schedule.agents[0].__class__.__name__}"
+    else:
+        return "Draw"
 
 
 class BattlefieldModel(Model):
@@ -46,15 +60,16 @@ class BattlefieldModel(Model):
         self.schedule = RandomActivation(self)
         self.fill_battlefield_TEST()
         self.running = True
-        self.data_collector = DataCollector(
+        self.datacollector = DataCollector(
             model_reporters={"Army count - Red": calculate_red,
-                             "Army count - Blue": calculate_blue})
+                             "Army count - Blue": calculate_blue, "winner": reporter})
         self.obstacle_list = [x for x in self.schedule.agents if x.__class__ == Obstacle]
         self.add_obstacles_to_dummy_board()
 
     def step(self):
+        self.running = battle_continious(self)
         self.schedule.step()
-        self.data_collector.collect(self)
+        self.datacollector.collect(self)
 
     def add_obstacles_to_dummy_board(self):
 
@@ -63,42 +78,101 @@ class BattlefieldModel(Model):
                 if self.is_in_obstacles((j, i)):
                     self.dummy_board[i][j] = 0
 
-
-
     def is_in_obstacles(self, pos):
         for obs in self.obstacle_list:
             if contains(obs, pos[0], pos[1]):
                 return True
         return False
 
-
     def fill_battlefield_TEST(self):
-        for i in range(100):
-            x = self.random.random() * self.space.x_max
-            y = self.random.random() * self.space.y_max
-            pos = np.array((x, y))
-            unit = np.random.choice([1, 2, 3])
-            if unit == 1:
-                knight = Infantry(
-                    i,
-                    self,
-                    pos
-                )
-            elif unit == 2:
-                knight = Cavalry(
-                    i,
-                    self,
-                    pos
-                )
-            elif unit == 3:
-                knight = Ranger(
-                    i,
-                    self,
-                    pos
-                )
-            self.space.place_agent(knight, pos)
-            self.schedule.add(knight)
 
-        a = Obstacle(105, self, [[50.0, 50.0], [50.0, 70.0], [70.0, 70.0], [70.0, 50.0]])
-        self.space.place_agent(a, (50, 50))
-        self.schedule.add(a)
+        army_rows_1 = [5, 10, 15]
+        army_rows_2 = [95, 90, 85]
+
+        for row in army_rows_1:
+            for comlumn in range(1, 99):
+                if row == army_rows_1[0]:
+                    pos = np.array((comlumn, row))
+                    knight_b = Ranger(
+                        row+comlumn,
+                        self,
+                        pos,
+                        "Blue"
+                    )
+                    self.space.place_agent(knight_b, pos)
+                    self.schedule.add(knight_b)
+                if row == army_rows_1[1]:
+                    pos = np.array((comlumn, row))
+                    knight_b = Infantry(
+                        row+comlumn+99,
+                        self,
+                        pos,
+                        "Blue"
+                    )
+                    self.space.place_agent(knight_b, pos)
+                    self.schedule.add(knight_b)
+                if row == army_rows_1[2]:
+                    pos = np.array((comlumn, row))
+                    knight_b = Cavalry(
+                        row+comlumn+99*2,
+                        self,
+                        pos,
+                        "Blue"
+                    )
+                    self.space.place_agent(knight_b, pos)
+                    self.schedule.add(knight_b)
+
+        for row in army_rows_2:
+            for comlumn in range(1, 99):
+                if row == army_rows_2[0]:
+                    pos = np.array((comlumn, row))
+                    knight_b = Ranger(
+                        row+comlumn+99*67,
+                        self,
+                        pos,
+                        "Red"
+                    )
+                    self.space.place_agent(knight_b, pos)
+                    self.schedule.add(knight_b)
+                if row == army_rows_2[1]:
+                    pos = np.array((comlumn, row))
+                    knight_b = Infantry(
+                        row+comlumn+99*77,
+                        self,
+                        pos,
+                        "Red"
+                    )
+                    self.space.place_agent(knight_b, pos)
+                    self.schedule.add(knight_b)
+                if row == army_rows_2[2]:
+                    pos = np.array((comlumn, row))
+                    knight_b = Cavalry(
+                        row+comlumn+99*87,
+                        self,
+                        pos,
+                        "Red"
+                    )
+                    self.space.place_agent(knight_b, pos)
+                    self.schedule.add(knight_b)
+
+        # for i in range(100):
+        #     x = self.random.random() * self.space.x_max
+        #     y = self.random.random() * self.space.y_max
+        #     pos = np.array((x, y))
+        #     unit = np.random.choice([1, 2, 3])
+        #     if unit == 1:
+        #
+        #     elif unit == 2:
+        #
+        #     elif unit == 3:
+        #         knight = Ranger(
+        #             i,
+        #             self,
+        #             pos
+        #         )
+        #     self.space.place_agent(knight, pos)
+        #     self.schedule.add(knight)
+
+        # a = Obstacle(105, self, [[200.0, 200.0], [200.0, 300.0], [300.0, 300.0], [300.0, 200.0]])
+        # self.space.place_agent(a, (50, 50))
+        # self.schedule.add(a)
