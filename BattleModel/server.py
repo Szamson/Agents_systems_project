@@ -24,7 +24,8 @@ chart = mesa.visualization.ChartModule([
 canvas = SimpleCanvas(draw, 500, 500)
 model_params = {
     "width": 100,
-    "height": 100
+    "height": 100,
+    "n": 4
 }
 
 server = mesa.visualization.ModularServer(

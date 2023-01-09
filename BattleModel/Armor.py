@@ -1,7 +1,7 @@
 class Armor:
 
     def __init__(self):
-        #  self.weakness = None TODO when all works
+
         self.dmg_reduction = None
         self.weight = None  # kg --> calculate speed reduction based on knight weight
 
@@ -9,7 +9,7 @@ class Armor:
 class PlateArmor(Armor):
 
     def __init__(self):
-        #  self.weakness = None
+
         self.dmg_reduction = 0.5
         self.weight = 27
 
@@ -17,14 +17,14 @@ class PlateArmor(Armor):
 class LeatherArmor(Armor):
 
     def __init__(self):
-        #  self.weakness = None
+
         self.dmg_reduction = 0.1
-        self.weight = 4  # TODO Fact check it
+        self.weight = 4
 
 
 class ChainMailArmor(Armor):
 
     def __init__(self):
-        #  self.weakness = None
+
         self.dmg_reduction = 0.3
-        self.weight = 10  # TODO Fact check it
+        self.weight = 10

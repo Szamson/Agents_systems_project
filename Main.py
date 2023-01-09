@@ -4,20 +4,21 @@ from BattleModel.BattlefieldModel import BattlefieldModel
 import pandas as pd
 
 if __name__ == '__main__':
-    # parameters = {"width": 100, "height": 100}
+    server.launch()
+    # parameters = {"width": 100, "height": 100, "n": 99}
     #
-    # a = batch_run(BattlefieldModel, parameters=parameters, iterations=10000, max_steps=100)
+    # a = batch_run(BattlefieldModel, parameters=parameters, iterations=10000, max_steps=500)
     #
     # b = pd.DataFrame.from_dict(a)
-    # win_inf = len([a for a in b["winner"] == "Cavalry" if a == True])
-    # win_cav = len([a for a in b["winner"] == "Ranger" if a == True])
-    # draw = len([a for a in b["winner"] == "Draw" if a == True])
-    # print(f"Cavalry wins :  {win_inf}")
-    # print(f"Ranger wins :  {win_cav}")
+    # win_blue = len([a for a in b["winner"] == "Blue" if a == True])
+    # win_red = len([a for a in b["winner"] == "Red" if a == True])
+    # print(f"Blue wins :  {win_blue}")
+    # print(f"Red wins :  {win_red}")
     # print(f"Draws :  {draw}")
 
     # print([a for a in b["winner"] == "Infantry" if True])
     #
     # print(b)
+    #
 
-    server.launch()
+

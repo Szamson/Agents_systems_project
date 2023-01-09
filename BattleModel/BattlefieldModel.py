@@ -30,24 +30,26 @@ def calculate_blue(model):
 
 
 def battle_continious(model):
-    temp_set = set(model.schedule.agents)
-    if len(temp_set) == 1 or len(temp_set) == 0:
+    red_number = calculate_red(model)
+    blue_number = calculate_blue(model)
+
+    if blue_number == 0 or red_number == 0:
         return False
     return True
 
 
 def reporter(model):
-    if len(model.schedule.agents):
-        return f"{model.schedule.agents[0].__class__.__name__}"
+    if calculate_red(model) > calculate_blue(model):
+        return "Red"
     else:
-        return "Draw"
+        return "Blue"
 
 
 class BattlefieldModel(Model):
 
-    def __init__(self, width, height):
+    def __init__(self, width, height, n):
         super().__init__()
-
+        self.test_n = n
         self.x_max = 100
         self.y_max = 100
         self.width = width
@@ -86,11 +88,71 @@ class BattlefieldModel(Model):
 
     def fill_battlefield_TEST(self):
 
+
+        # squized rectangle
+
+        # army_rows_1 = [5]
+        #
+        #
+        # for row in army_rows_1:
+        #     for comlumn in range(1, 99, 99):
+        #         pos = np.array((comlumn, row))
+        #         knight_b = Cavalry(
+        #             row*1000+comlumn,
+        #             self,
+        #             pos,
+        #             "Blue"
+        #         )
+        #         self.space.place_agent(knight_b, pos)
+        #         self.schedule.add(knight_b)
+        #
+        # army_rows_3 = [5, 7, 9, 11, 13]
+        #
+        # for row in army_rows_3:
+        #     for comlumn in range(1, 30, 5):
+        #         pos = np.array((comlumn, row))
+        #         knight_b = Infantry(
+        #             row*1000+comlumn,
+        #             self,
+        #             pos,
+        #             "Blue"
+        #         )
+        #         self.space.place_agent(knight_b, pos)
+        #         self.schedule.add(knight_b)
+        #
+        #     for comlumn in range(65, 99, 6):
+        #         pos = np.array((comlumn, row))
+        #         knight_b = Infantry(
+        #             row*1000+comlumn,
+        #             self,
+        #             pos,
+        #             "Blue"
+        #         )
+        #         self.space.place_agent(knight_b, pos)
+        #         self.schedule.add(knight_b)
+
+        # army_rows_2 = [95]
+        #
+        # for row in army_rows_2:
+        #     for comlumn in range(1, 99, self.test_n):
+        #         pos = np.array((comlumn, row))
+        #         knight_b = Infantry(
+        #             row*1000+comlumn,
+        #             self,
+        #             pos,
+        #             "Red"
+        #         )
+        #         self.space.place_agent(knight_b, pos)
+        #         self.schedule.add(knight_b)
+
+
+        # 7 and 8
+
         army_rows_1 = [5, 10, 15]
         army_rows_2 = [95, 90, 85]
 
         for row in army_rows_1:
-            for comlumn in range(1, 99):
+            for comlumn in range(1, 99, 4):
                 if row == army_rows_1[0]:
                     pos = np.array((comlumn, row))
                     knight_b = Ranger(
@@ -123,7 +185,7 @@ class BattlefieldModel(Model):
                     self.schedule.add(knight_b)
 
         for row in army_rows_2:
-            for comlumn in range(1, 99):
+            for comlumn in range(1, 99, self.test_n):
                 if row == army_rows_2[0]:
                     pos = np.array((comlumn, row))
                     knight_b = Ranger(
@@ -154,6 +216,8 @@ class BattlefieldModel(Model):
                     )
                     self.space.place_agent(knight_b, pos)
                     self.schedule.add(knight_b)
+
+        # Chaos test
 
         # for i in range(100):
         #     x = self.random.random() * self.space.x_max
